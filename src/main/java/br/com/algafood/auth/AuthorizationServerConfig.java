@@ -33,7 +33,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("app-mobile")
 				.secret(encoder.encode("mobile123"))
 				.authorizedGrantTypes("password")
-				.scopes("write", "read");
+				.scopes("write", "read")
+				.accessTokenValiditySeconds(600)
+			.and()
+				.withClient("checktoken")
+					.secret(encoder.encode("check123"));
 	}
 	
 	@Override
