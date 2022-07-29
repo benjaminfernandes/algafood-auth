@@ -3,6 +3,7 @@ package br.com.algafood.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -20,15 +21,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients
 			.inMemory()
 				.withClient("algafood-web")
 				.secret(encoder.encode("web123"))
-				.authorizedGrantTypes("password")//informa o fluxo utilizado, ex password, client-credentials
+				.authorizedGrantTypes("password", "refresh_token")//informa o fluxo utilizado, ex password, client-credentials
 				.scopes("write", "read")
-				.accessTokenValiditySeconds(600)
+				.accessTokenValiditySeconds(6 * 60 * 60) // horas
+				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) //60 dias
 			.and()
 				.withClient("app-mobile")
 				.secret(encoder.encode("mobile123"))
@@ -49,7 +54,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints
-			.authenticationManager(this.authenticationManager); //somente o fluxo password utiliza o authentication manager para validar o usuario e senha do usuário final
+			.authenticationManager(this.authenticationManager) //somente o fluxo password utiliza o authentication manager para validar o usuario e senha do usuário final
+			.userDetailsService(userDetailsService);
+			//.reuseRefreshTokens(false);//invalida a reutilização do refresh token.
 	}
 	
 }
