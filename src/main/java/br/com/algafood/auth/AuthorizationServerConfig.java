@@ -41,7 +41,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.scopes("write", "read")
 				.accessTokenValiditySeconds(600)
 			.and()
-				.withClient("checktoken")
+				.withClient("faturamento")
+				.secret(encoder.encode("faturamento123"))
+				.authorizedGrantTypes("client_credentials")
+				.scopes("write", "read")
+			.and()
+				.withClient("foodanalytics")
+				.secret(encoder.encode("food123"))
+				.authorizedGrantTypes("authorization_code")
+				.scopes("write", "read")
+				.redirectUris("http://aplicacao-cliente")
+			.and()
+				.withClient("checktoken")//libera a uri de checagem de token
 					.secret(encoder.encode("check123"));
 	}
 	
