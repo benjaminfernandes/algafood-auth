@@ -51,7 +51,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.scopes("write", "read")
 			.and()
 				.withClient("foodanalytics")
-				.secret(encoder.encode("food123"))
+				.secret(encoder.encode("food123"))//Authorization code não é obrigatório o password - o ideal é ter o client_secret e dar a opção para o cliente autenticar com client_secret ou pkce
 				.authorizedGrantTypes("authorization_code")
 				.scopes("write", "read")
 				.redirectUris("http://aplicacao-cliente")
@@ -62,7 +62,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		security.checkTokenAccess("isAuthenticated()");//Expressoes de segurança do spring security - Indica que para acessar este endpoint deve estar authenticado /oauth/check_token
+		security.checkTokenAccess("isAuthenticated()")//Expressoes de segurança do spring security - Indica que para acessar este endpoint deve estar authenticado /oauth/check_token
+		.allowFormAuthenticationForClients();//indica que pode ser passado o client_id como uma chave no corpo da requisição - Authentication code flow PKCE
 		//security.checkTokenAccess("permitAll()");		
 	}
 	
@@ -85,5 +86,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		
 		return new CompositeTokenGranter(granters);
 	}
+	
 	
 }

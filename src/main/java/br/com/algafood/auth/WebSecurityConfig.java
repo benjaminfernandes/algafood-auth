@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	//@Autowired
+	//private UserDetailsService userDetailsService;
+	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()
@@ -27,6 +30,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.roles("ADMIN");
 	}
 	
+	
+	//Implementação do remember-me Aula 22.27 - Sessão perguntas "Recurso remember-me"
+	/*
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+			.formLogin().loginPage("/login")
+			.and()
+			.authorizeRequests()
+				.antMatchers("/oauth/**").authenticated()
+			.and()
+			.csrf().disable()
+			.cors().and()
+			
+			//Adicionado logout
+			.logout()
+				.deleteCookies("JSESSIONID")
+			.and()
+				
+			//Adicionado Remember-me
+			.rememberMe()
+				.rememberMeParameter("remember-me")
+				.tokenValiditySeconds(8000)
+				.userDetailsService(userDetailsService)
+			.and()
+			.userDetailsService(userDetailsService)
+				
+			.oauth2ResourceServer().jwt()
+				.jwtAuthenticationConverter(jwtAuthenticationConverter());
+	}
+	*/
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
