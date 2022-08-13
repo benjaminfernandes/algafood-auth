@@ -3,6 +3,7 @@ package br.com.algafood.auth;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 @Configuration
 @EnableAuthorizationServer
@@ -27,6 +29,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	//@Autowired configuração do para utilizar o redis
+	//private RedisConnectionFactory redisConnectionFactory;
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -72,8 +77,22 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints
 			.authenticationManager(this.authenticationManager) //somente o fluxo password utiliza o authentication manager para validar o usuario e senha do usuário final
 			.userDetailsService(userDetailsService)
-			.tokenGranter(tokenGranter(endpoints));
-			//.reuseRefreshTokens(false);//invalida a reutilização do refresh token.
+			.tokenGranter(tokenGranter(endpoints))
+			.reuseRefreshTokens(false)//invalida a reutilização do refresh token.
+			.accessTokenConverter(jwtAccessTokenConverter());
+			//.tokenStore(redisTokenStore());
+
+	}
+	
+	/*private TokenStore redisTokenStore() {
+		return new RedisTokenStore(this.redisConnectionFactory);
+	}*/
+
+	@Bean
+	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		jwtAccessTokenConverter.setSigningKey("123456");//utiliza o algoritmo hmacsha26 assinatura simetrica
+		return jwtAccessTokenConverter;
 	}
 	
 	private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
