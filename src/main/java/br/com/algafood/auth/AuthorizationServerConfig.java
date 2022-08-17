@@ -16,6 +16,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
@@ -85,10 +88,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.userDetailsService(userDetailsService)
 			.tokenGranter(tokenGranter(endpoints))
 			.reuseRefreshTokens(false)//invalida a reutilização do refresh token.
-			.accessTokenConverter(jwtAccessTokenConverter());
+			.accessTokenConverter(jwtAccessTokenConverter())
+			.approvalStore(approvalStore(endpoints.getTokenStore()));//aula 23.13 deve ser sempre após o accessTokenConverter
 			//.tokenStore(redisTokenStore());
 
 	}
+	
+	private ApprovalStore approvalStore(TokenStore tokenStore) {
+		var approvalStore = new TokenApprovalStore();
+		approvalStore.setTokenStore(tokenStore);
+		
+		return approvalStore;
+	} 
 	
 	/*private TokenStore redisTokenStore() {
 		return new RedisTokenStore(this.redisConnectionFactory);
