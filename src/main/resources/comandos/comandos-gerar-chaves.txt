@@ -1,0 +1,15 @@
+1) keytool -genkeypair -alias algafood -keyalg RSA -keypass 123456 -keystore algafood.jks -storepass 123456 -validity 3650
+	Gerando um arquivo jks com um par de chaves
+
+2) Lista as entradas do keystore
+	keytool -list -keystore algafood.jks
+
+
+3) Comando para exportar um certificado a partir do keystore 
+	keytool -export -rfc -alias algafood -keystore algafood.jks -file algafood-cert.pem
+Obs: Utiliza o alias para capturar o certificado 
+
+4) Comando para gerar a chave pública
+	openssl x509 -pubkey -noout -in algafood-cert.pem > algafood-pkey.pem
+	
+	

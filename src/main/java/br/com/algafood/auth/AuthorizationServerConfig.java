@@ -32,6 +32,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
+	@Autowired
+	private JwtKeyStoreProperties jwtKeyStoreProperties;  
+	
 	//@Autowired configuração do para utilizar o redis
 	//private RedisConnectionFactory redisConnectionFactory;
 	
@@ -70,6 +73,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 		security.checkTokenAccess("isAuthenticated()")//Expressoes de segurança do spring security - Indica que para acessar este endpoint deve estar authenticado /oauth/check_token
+		.tokenKeyAccess("permitAll()")//permite utilizar o endpoint /oauth/token_key para capturar a chave pública da assinatura assimétrica do token
 		.allowFormAuthenticationForClients();//indica que pode ser passado o client_id como uma chave no corpo da requisição - Authentication code flow PKCE
 		//security.checkTokenAccess("permitAll()");		
 	}
@@ -90,14 +94,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		return new RedisTokenStore(this.redisConnectionFactory);
 	}*/
 
+	//Aulas 23.09 a 23.11
 	@Bean
 	public JwtAccessTokenConverter jwtAccessTokenConverter() {
 		var jwtAccessTokenConverter = new JwtAccessTokenConverter();
 		//jwtAccessTokenConverter.setSigningKey("8a9sf5asdf6a4sd6f48sd45fa4sd65f48asd4f65ad4sf8d5d5d5d8sa65");//utiliza o algoritmo hmacsha26 assinatura simetrica
 		
-		var jksResource = new ClassPathResource("keystores/algafood.jks");
-		var keyStorePass = "123456"; //senha para abrir o arquivo jks
-		var keyPairAlias = "algafood";
+		var jksResource = new ClassPathResource(this.jwtKeyStoreProperties.getPath());
+		var keyStorePass = this.jwtKeyStoreProperties.getPassword(); //senha para abrir o arquivo jks
+		var keyPairAlias = this.jwtKeyStoreProperties.getKeypairAlias();
 		
 		var keyStoreKeyFactory = new KeyStoreKeyFactory(jksResource, keyStorePass.toCharArray());
 		var keyPair = keyStoreKeyFactory.getKeyPair(keyPairAlias);
