@@ -1,12 +1,10 @@
-package br.com.algafood.auth;
+package br.com.algafood.auth.core;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -15,10 +13,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	@Override
+	protected AuthenticationManager authenticationManager() throws Exception {
+		return super.authenticationManager();
+	}
+	
 	//@Autowired
 	//private UserDetailsService userDetailsService;
 	
-	@Override
+	/*
+	 * Método utilizado para testes rápidos de autenticações
+	 * @Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()
 			.withUser("benjamin")
@@ -29,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.password(passwordEncoder().encode("123"))
 				.roles("ADMIN");
 	}
+	*/
 	
 	
 	//Implementação do remember-me Aula 22.27 - Sessão perguntas "Recurso remember-me"
@@ -61,20 +73,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.jwtAuthenticationConverter(jwtAuthenticationConverter());
 	}
 	*/
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
 	
-	@Bean
-	@Override
-	protected AuthenticationManager authenticationManager() throws Exception {
-		return super.authenticationManager();
-	}
-	
-	@Bean
+	/*
+	 * Para testes de usuários em memória
+	 * @Bean
 	@Override
 	protected UserDetailsService userDetailsService() {
 		return super.userDetailsService();
 	}
+	*/
 }
