@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
@@ -83,12 +84,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		var enhancerChain = new TokenEnhancerChain();
+		enhancerChain.setTokenEnhancers(Arrays.asList(new JwtCustomClaimsTokenEnhancer(), jwtAccessTokenConverter()));
+		
 		endpoints
 			.authenticationManager(this.authenticationManager) //somente o fluxo password utiliza o authentication manager para validar o usuario e senha do usuário final
 			.userDetailsService(userDetailsService)
 			.tokenGranter(tokenGranter(endpoints))
 			.reuseRefreshTokens(false)//invalida a reutilização do refresh token.
-			.accessTokenConverter(jwtAccessTokenConverter())
+			.accessTokenConverter(jwtAccessTokenConverter()) //ele também implementa o TokenEnhancer
+			.tokenEnhancer(enhancerChain)
 			.approvalStore(approvalStore(endpoints.getTokenStore()));//aula 23.13 deve ser sempre após o accessTokenConverter
 			//.tokenStore(redisTokenStore());
 
