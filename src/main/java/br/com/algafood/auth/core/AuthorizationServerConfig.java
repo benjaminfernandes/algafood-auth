@@ -49,25 +49,25 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("algafood-web")
 				.secret(encoder.encode("web123"))
 				.authorizedGrantTypes("password", "refresh_token")//informa o fluxo utilizado, ex password, client-credentials
-				.scopes("write", "read")
+				.scopes("WRITE", "READ")
 				.accessTokenValiditySeconds(6 * 60 * 60) // horas
 				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) //60 dias
 			.and()
 				.withClient("app-mobile")
 				.secret(encoder.encode("mobile123"))
 				.authorizedGrantTypes("password")
-				.scopes("write", "read")
+				.scopes("WRITE", "READ")
 				.accessTokenValiditySeconds(600)
 			.and()
 				.withClient("faturamento")
 				.secret(encoder.encode("faturamento123"))
 				.authorizedGrantTypes("client_credentials")
-				.scopes("write", "read")
+				.scopes("WRITE", "READ")
 			.and()
 				.withClient("foodanalytics")
 				.secret(encoder.encode("food123"))//Authorization code não é obrigatório o password - o ideal é ter o client_secret e dar a opção para o cliente autenticar com client_secret ou pkce
 				.authorizedGrantTypes("authorization_code")
-				.scopes("write", "read")
+				.scopes("WRITE", "READ")
 				.redirectUris("http://aplicacao-cliente")
 			.and()
 				.withClient("checktoken")//libera a uri de checagem de token
