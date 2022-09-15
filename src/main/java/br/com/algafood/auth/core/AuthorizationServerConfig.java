@@ -2,13 +2,14 @@ package br.com.algafood.auth.core;
 
 import java.util.Arrays;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -27,8 +28,8 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-	@Autowired
-	private PasswordEncoder encoder;
+	//@Autowired
+	//private PasswordEncoder encoder;
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -37,14 +38,24 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	private UserDetailsService userDetailsService;
 	
 	@Autowired
-	private JwtKeyStoreProperties jwtKeyStoreProperties;  
+	private JwtKeyStoreProperties jwtKeyStoreProperties; 
+	
+	@Autowired
+	private DataSource dataSource;
 	
 	//@Autowired configuração do para utilizar o redis
 	//private RedisConnectionFactory redisConnectionFactory;
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients
+		
+		clients.jdbc(dataSource);//via banco de dados
+		
+		
+		/*
+		 * Configuração inMemory...
+		 * 
+		 * clients
 			.inMemory()
 				.withClient("algafood-web")
 				.secret(encoder.encode("web123"))
@@ -71,7 +82,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.redirectUris("http://aplicacao-cliente")
 			.and()
 				.withClient("checktoken")//libera a uri de checagem de token
-					.secret(encoder.encode("check123"));
+					.secret(encoder.encode("check123"));*/
 	}
 	
 	@Override
